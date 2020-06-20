@@ -1,0 +1,14 @@
+maubot: 0.1.0
+id: xyz.maubot.satwcomic
+version: 1.0.0
+license: AGPL-3.0-or-later
+modules:
+- satwcomic
+main_class: SatWBot
+extra_files:
+- base-config.yaml
+database: true
+dependencies:
+- pyquery
+soft_dependencies:
+- Pillow
