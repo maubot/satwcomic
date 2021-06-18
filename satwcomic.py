@@ -48,7 +48,7 @@ except ImportError:
 
 
 @dataclass
-class SatWInfo(SerializableAttrs['SatWInfo']):
+class SatWInfo(SerializableAttrs):
     slug: str
     image_url: str
     date: datetime
