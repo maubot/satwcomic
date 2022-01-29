@@ -206,6 +206,19 @@ class SatWBot(Plugin):
         return "".join(text)
 
     async def get_comic(self, slug: str) -> Tuple[Optional[SatWInfo], str]:
+        if slug == "latest":
+            resp = await self.http.get(f"https://satwcomic.com/")
+            if resp.status != 200:
+                resp.raise_for_status()
+                return None, ""
+            data = await resp.text(errors="ignore")
+            q = PyQuery(data)
+            latest_url = q(".card a:has(ion-icon):Contains('View latest comic')").attr("href")
+            if not latest_url.startswith("https://satwcomic.com/"):
+                raise ValueError("Couldn't find latest comic URL")
+            slug = latest_url[len("https://satwcomic.com/"):]
+            self.log.trace(f"Latest comic: {slug}")
+            return await self.get_comic(slug)
         resp = await self.http.get(f"https://satwcomic.com/{slug}")
         if resp.status != 200:
             resp.raise_for_status()
@@ -213,9 +226,9 @@ class SatWBot(Plugin):
         data = await resp.text(errors="ignore")
         q = PyQuery(data)
         try:
-            if slug == "latest":
-                url = q("a.btn[title^='Permanent link']").attr("href")
-                slug = url[len("https://satwcomic.com/"):]
+            #if slug == "latest":
+            #    url = q("a.btn[title^='Permanent link']").attr("href")
+            #    slug = url[len("https://satwcomic.com/"):]
             image_url = q(".card > center img[itemprop='image']").attr("src").replace("/core", "")
             title = q("[itemprop='headline']").text()
             body = self._parse_body(q("[itemprop='articleBody']")[0])
