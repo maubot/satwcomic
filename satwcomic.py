@@ -176,7 +176,7 @@ class SatWBot(Plugin):
         self.db = db_session
         self.latest_slug = ""
 
-        self.poll_task = asyncio.ensure_future(self.poll_comic(), loop=self.loop)
+        self.poll_task = asyncio.create_task(self.poll_comic())
 
     async def stop(self) -> None:
         await super().stop()
@@ -322,8 +322,7 @@ class SatWBot(Plugin):
         spam_sleep = self.config["spam_sleep"]
         if spam_sleep < 0:
             await asyncio.gather(*[self.send_comic(sub.room_id, comic)
-                                   for sub in subscribers],
-                                 loop=self.loop)
+                                   for sub in subscribers])
         else:
             for sub in subscribers:
                 await self.send_comic(sub.room_id, comic)
@@ -344,7 +343,7 @@ class SatWBot(Plugin):
         latest, _ = await self.get_comic("latest")
         self.latest_slug = latest.slug
         while True:
-            await asyncio.sleep(self.config["poll_interval"], loop=self.loop)
+            await asyncio.sleep(self.config["poll_interval"])
             try:
                 latest, _ = await self.get_comic("latest")
                 if latest.slug != self.latest_slug:
